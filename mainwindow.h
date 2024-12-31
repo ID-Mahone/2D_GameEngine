@@ -12,7 +12,10 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
+    // Create main window
     explicit MainWindow(QWidget *parent = nullptr);
+
+    // Destructor to clean up resources
     ~MainWindow();
 
 private slots:
@@ -20,10 +23,11 @@ private slots:
 
 private:
     void setupScene();
+
     QGraphicsView *view;
     QGraphicsScene *scene;
-    Player *player;
-    Map *map;
+    Map *map;          // Move this declaration before player
+    Player *player;    // Now player is declared after map
     QTimer *timer;
 };
 

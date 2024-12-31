@@ -12,31 +12,50 @@ public:
         Dirt,
         Water,
         Road,
-        Tree, // New tile type
-        Flower // New tile type
+        Tree,
+        Flower
     };
 
+    // Constructor to initialize the tile type
     Tile(TileType type = Grass);
-    void draw(QPainter &painter, int x, int y, int tileSize); // Add tileSize parameter
+
+    // Method to draw the tile at given coordinates with a specific tile size
+    void draw(QPainter &painter, int x, int y, int tileSize);
+    TileType getType() const { return type; } // Getter method for type
 
 private:
-    TileType type;
+    TileType type; // type of the tile (e.g. Grass, Dirt, etc.)
 };
 
+
+//Represent the
 class Map : public QGraphicsItem {
 public:
-    Map(int width, int height, int tileSize); // Add tileSize to constructor
+    // Constructor for map size
+    Map(int width, int height, int tileSize);
+
+    // Method to set the tile at a specific coordinate with a given type
+    void loadFromCharMap(const char charMap[15][20]);
+
+
+    // Method to load the map from a char-based map layout
     void setTile(int x, int y, Tile::TileType type);
 
+    bool isWalkable(int x, int y) const;
+
     QRectF boundingRect() const override;
+
+
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
+
+    Tile::TileType getTileType(int x, int y) const;
 
     int getTileSize() const { return tileSize; }
 
 private:
-    int width, height;
-    int tileSize; // Store tile size
-    std::vector<Tile> tiles;
+    int width, height; // Width and height of the map in tiles
+    int tileSize; // Size of each tile in pixels
+    std::vector<Tile> tiles; // Vector to store all tiles
 };
 
 #endif // MAP_H

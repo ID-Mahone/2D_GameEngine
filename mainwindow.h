@@ -7,6 +7,7 @@
 #include <QTimer>
 #include "map.h"
 #include "player.h"
+#include "enemy.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -28,6 +29,7 @@ private:
     QGraphicsScene *scene;
     Map *map;          // Move this declaration before player
     Player *player;    // Now player is declared after map
+    Enemy *enemy;
     QTimer *timer;
 };
 

@@ -1,27 +1,49 @@
 #include "player.h"
 #include "map.h"
 #include <QPainter>
-#include <QPropertyAnimation>
 #include <QKeyEvent>
-#include <QSequentialAnimationGroup>
+#include <QTimer>
+#include <QPixmap>
+#include <QTransform>
+#include <QDebug>
 
-Player::Player(Map *map) : map(map) {
-    // Player initialization
+Player::Player(Map *map)
+    : currentFrame(0), currentRow(0), map(map), dx(0), dy(0) {
+
+    spriteSheet.load(":/resources/player.png/player.png");  // Load the sprite sheet from resources
+
+    if (spriteSheet.isNull()) {
+        qDebug() << "Failed to load sprite sheet!";
+    } else {
+        qDebug() << "Sprite sheet loaded successfully.";
+    }
+
+    animationTimer = new QTimer(this);
+    connect(animationTimer, &QTimer::timeout, this, &Player::updateFrame);
+    animationTimer->start(1000);  // Update the frame every 100ms
 }
 
 QRectF Player::boundingRect() const {
-    // Define the bounds of the player object
-    return QRectF(0, 0, 30, 30);
+    return QRectF(0, 0, 48, 48);  // Assuming 48x48 sprite size
 }
 
-void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
-    // Draw the player object
-    painter->setBrush(Qt::red);
-    painter->drawRect(boundingRect());
-}
+void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    int frameX = currentFrame * 48;
+    int frameY = currentRow * 48;
 
-void Player::handleKeyPress(QKeyEvent *event) {
-    keyPressEvent(event);
+    QPixmap frame = spriteSheet.copy(frameX, frameY, 48, 48);
+
+    frame = frame.scaled(48, 48, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+    if (!isFacingRight) {
+        QTransform transform;
+        transform.scale(-1, 1);  // Flip horizontally
+        frame = frame.transformed(transform);
+
+        painter->drawPixmap(0, 0, frame);  // Offset by sprite width
+    } else {
+        painter->drawPixmap(0, 0, frame);
+    }
 }
 
 void Player::keyPressEvent(QKeyEvent *event) {
@@ -55,47 +77,50 @@ void Player::keyPressEvent(QKeyEvent *event) {
 }
 
 void Player::move(int dx, int dy) {
-    QPropertyAnimation *animation = new QPropertyAnimation(this, "pos");
-    animation->setDuration(100);
-    animation->setStartValue(pos());
-    animation->setEndValue(pos() + QPointF(dx, dy));
-    animation->setEasingCurve(QEasingCurve::InOutQuad);
-    animation->start(QAbstractAnimation::DeleteWhenStopped);
+    // Update the position of the player (implement logic for movement)
+    float newX = x() + dx;
+    float newY = y() + dy;
+
+    if(canMoveToTile(newX, newY)) {
+        setPos(newX, newY);
+    }
 }
 
 void Player::jump() {
-    if (isJumping) return;
-
-    isJumping = true;
-
-    QPropertyAnimation *jumpUp = new QPropertyAnimation(this, "pos");
-    jumpUp->setDuration(200);
-    jumpUp->setStartValue(pos());
-    jumpUp->setEndValue(pos() + QPointF(0, -50));
-    jumpUp->setEasingCurve(QEasingCurve::OutQuad);
-
-    QPropertyAnimation *jumpDown = new QPropertyAnimation(this, "pos");
-    jumpDown->setDuration(200);
-    jumpDown->setStartValue(pos() + QPointF(0, -50));
-    jumpDown->setEndValue(pos());
-    jumpDown->setEasingCurve(QEasingCurve::InQuad);
-
-    QSequentialAnimationGroup *jump = new QSequentialAnimationGroup(this);
-    jump->addAnimation(jumpUp);
-    jump->addAnimation(jumpDown);
-
-    connect(jump, &QSequentialAnimationGroup::finished, [this]() {
-        isJumping = false;
-    });
-    jump->start(QAbstractAnimation::DeleteWhenStopped);
+    if (!isJumping) {
+        // Implement jump logic
+        isJumping = true;
+        setAnimationRow(6);  // Set to the jump/attack row
+        QTimer::singleShot(500, this, [this]() {  // Simulate jump completion
+            isJumping = false;
+            setAnimationRow(0);  // Return to idle row
+        });
+    }
 }
 
-bool Player::canMoveToTile(int x, int y) {
-    // Convert pixel coordinates to tile coordinates
-    int tileX = x / map->getTileSize();
-    int tileY = y / map->getTileSize();
+bool Player::canMoveToTile(float dx, float dy) {
+    // Convert world coordinates to tile coordinates
+    int tileX = dx / map->getTileSize();
+    int tileY = dy / map->getTileSize();
 
-    // Check walkability of the tile
-    return map->isWalkable(tileX, tileY);
+    qDebug() << "Checking walkability at tile coordinates (" << tileX << ", "<< tileY <<")";
+
+    bool walkable = map->isWalkable(tileX, tileY);
+    qDebug() << "Tile at (" << tileX << ", " << tileY << ") is walkable:" << walkable;
+
+
+    // Check if the tile is walkable using the map's isWalkable method
+    return walkable;
+}
+
+void Player::updateFrame() {
+    // Update the frame for the animation
+    currentFrame = (currentFrame + 1) % 3;  // Loop through 3 frames for the current action
+    update();  // Trigger a repaint of the player
+}
+
+void Player::setAnimationRow(int row) {
+    currentRow = row;  // Set the row based on the current action
+    currentFrame = 0;  // Reset the frame to the start of the animation
 }
 

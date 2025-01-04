@@ -3,6 +3,8 @@
 
 #include <QGraphicsObject>
 #include <QObject>
+#include <QPixmap>
+#include <QTimer>
 
 class Map;  // Forward declaration of the Map class
 class QKeyEvent;
@@ -18,16 +20,30 @@ public:
 
     void handleKeyPress(QKeyEvent *event);
 
+    void move(int dx, int dy);
+    void jump();
 protected:
     void keyPressEvent(QKeyEvent *event) override;
 
 private:
-    void move(int dx, int dy);
-    void jump();
-    bool canMoveToTile(int x, int y);  // Check if the tile is walkable
-    bool isJumping = false;
+    bool isJumping = false;            // Flag for jumping
+    bool isFacingRight = false;         // Direction the player is facing
+    int currentFrame = 0;              // Current animation frame
+    int currentRow = 0;                // Current row (action) in the sprite sheet
 
-    Map *map;  // Reference to the map for checking walkability
+    QPixmap spriteSheet;               // Sprite sheet image (loaded from file)
+    QTimer *animationTimer;            // Timer to update animation frames
+    Map *map;
+
+    float dx = 0;
+    float dy = 0;
+    float moveSpeed = 2.0f;        // Reference to the map for checking walkability
+
+
+    void updateFrame();                // Advance the current animation frame
+    //  void move(int dx, int dy);         // Move the player                     // Jump action
+    void setAnimationRow(int row);     // Set the animation row for the current action
+    bool canMoveToTile(float newX, float newY);  // Check if the tile is walkable
 };
 
 #endif // PLAYER_H

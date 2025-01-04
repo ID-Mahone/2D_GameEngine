@@ -68,9 +68,18 @@ void Map::loadFromCharMap( const char charMap[15][20]) {
 bool Map::isWalkable(int x, int y) const {
     if (x >= 0 && x < width && y >= 0 && y < height) {
         Tile::TileType tileType = tiles[y * width + x].getType();
-        // Only Grass and Road tiles should be walkable
-        return tileType == Tile::Grass || tileType == Tile::Dirt;
+        qDebug() << "Checking tile at position (" << x << ", " << y << ") - Type:" << tileType;
+
+        // Only Grass and Dirt tiles should be walkable
+        if (tileType == Tile::Grass || tileType == Tile::Dirt) {
+            qDebug() << "Tile is walkable!";
+            return true;
+        } else {
+            qDebug() << "Tile is blocked.";
+            return false;
+        }
     }
+    qDebug() << "Position out of bounds: (" << x << ", " << y << ")";
     return false;  // Out of bounds tiles are non-walkable
 }
 
@@ -79,8 +88,6 @@ QRectF Map::boundingRect() const {
 }
 
 void Map::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
     for (int y = 0; y < height; ++y){
         for (int x = 0; x < width; ++x) {
             tiles[y * width + x].draw(*painter, x * tileSize, y * tileSize, tileSize);

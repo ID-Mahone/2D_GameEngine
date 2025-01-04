@@ -1,12 +1,18 @@
 #include "mainwindow.h"
 #include "player.h"
+#include "enemy.h"
 #include "map.h"
 #include <QGraphicsView>
 #include <QTimer>
 #include <QKeyEvent>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), scene(new QGraphicsScene(this)), map(new Map(20, 15, 32)), player(new Player(map)) {
+    : QMainWindow(parent),
+    scene(new QGraphicsScene(this)),
+    map(new Map(20, 15, 32)),  // Map initialized before player
+    player(new Player(map)),   // Player initialized after map
+    enemy(new Enemy(map)),     // Enemy initialized after player
+    timer(new QTimer(this)) {
     setFixedSize(800, 600);
 
     view = new QGraphicsView(scene, this);
@@ -17,9 +23,16 @@ MainWindow::MainWindow(QWidget *parent)
     scene->addItem(map);
     scene->addItem(player);
 
-    player->setPos(48, 48);
+    player->setPos(32, 32);
     player->setFlag(QGraphicsItem::ItemIsFocusable);
     player->setFocus();
+
+    Enemy *enemy = new Enemy(map);
+    enemy->setPos(31, 31); // Set initial position for the enemy
+    enemy->setZValue(2);
+
+
+    scene->addItem(enemy);
 
     const char charMap[15][20] = {
                                   {'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T'},
@@ -28,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
                                   {'T', 'G', 'D', 'G', 'G', 'G', 'G', 'G', 'R', 'R', 'R', 'R', 'G', 'G', 'G', 'G', 'G', 'D', 'G', 'T'},
                                   {'T', 'G', 'D', 'G', 'R', 'R', 'R', 'R', 'G', 'G', 'G', 'R', 'R', 'R', 'R', 'G', 'G', 'D', 'G', 'T'},
                                   {'T', 'G', 'D', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'D', 'G', 'T'},
-                                  {'T', 'G', 'D', 'G', 'G', 'G', 'G', 'G', 'F', 'G', 'G', 'F', 'G', 'G', 'F', 'G', 'G', 'G', 'D', 'G'},
+                                  {'T', 'G', 'D', 'G', 'G', 'G', 'G', 'G', 'F', 'G', 'G', 'F', 'G', 'G', 'F', 'G', 'G', 'D', 'D', 'D'},
                                   {'T', 'G', 'D', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'D', 'G', 'T'},
                                   {'T', 'G', 'D', 'G', 'G', 'G', 'G', 'G', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'G', 'G', 'D', 'G', 'T'},
                                   {'T', 'G', 'D', 'G', 'G', 'G', 'G', 'G', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'G', 'G', 'D', 'G', 'T'},

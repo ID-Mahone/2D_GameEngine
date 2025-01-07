@@ -6,6 +6,7 @@ CONFIG += c++17
 
 SOURCES += \
     enemy.cpp \
+    frog.cpp \
     main.cpp \
     mainwindow.cpp \
     map.cpp \
@@ -14,6 +15,7 @@ SOURCES += \
 
 HEADERS += \
     enemy.h \
+    frog.h \
     mainwindow.h \
     map.h \
     player.h
@@ -28,4 +30,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     enemy.qrc \
-    player.qrc
+    frog.qrc \
+    player.qrc \
+    player2.qrc \
+    tree.qrc

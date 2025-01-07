@@ -40,6 +40,7 @@ Map::Map(int width, int height, int tileSize)
     tiles.resize(width * height);
 }
 
+
 void Map::setTile(int x, int y, Tile::TileType type) {
     if (x >= 0 && x < width && y >= 0 && y < height) {
         tiles[y * width + x] = Tile(type);

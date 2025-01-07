@@ -10,7 +10,7 @@
 Player::Player(Map *map)
     : currentFrame(0), currentRow(0), map(map), dx(0), dy(0) {
 
-    spriteSheet.load(":/resources/player.png/player.png");  // Load the sprite sheet from resources
+    spriteSheet.load(":/resources/player2.png/player2.png");  // Load the sprite sheet from resources
 
     if (spriteSheet.isNull()) {
         qDebug() << "Failed to load sprite sheet!";
@@ -20,7 +20,7 @@ Player::Player(Map *map)
 
     animationTimer = new QTimer(this);
     connect(animationTimer, &QTimer::timeout, this, &Player::updateFrame);
-    animationTimer->start(1000);  // Update the frame every 100ms
+    animationTimer->start(20);  // Update the frame every /ms
 }
 
 QRectF Player::boundingRect() const {
@@ -39,6 +39,7 @@ void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
         QTransform transform;
         transform.scale(-1, 1);  // Flip horizontally
         frame = frame.transformed(transform);
+
 
         painter->drawPixmap(0, 0, frame);  // Offset by sprite width
     } else {

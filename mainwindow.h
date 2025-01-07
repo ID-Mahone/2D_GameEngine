@@ -8,6 +8,7 @@
 #include "map.h"
 #include "player.h"
 #include "enemy.h"
+#include "frog.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -30,6 +31,7 @@ private:
     Map *map;          // Move this declaration before player
     Player *player;    // Now player is declared after map
     Enemy *enemy;
+    Frog *frog;
     QTimer *timer;
 };
 

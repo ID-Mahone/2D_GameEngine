@@ -48,9 +48,8 @@ MainWindow::MainWindow(QWidget *parent)
     enemy->setPos(31, 31); // Set initial position for the enemy
     enemy->setZValue(2);
 
-    Frog *frog = new Frog(map);
-    frog->setPos(30, 30); // Set initial position for the enemy
-    frog->setZValue(3);
+    frog->setPos(31, 31); // Set initial position for the enemy
+    frog->setZValue(2);
 
     scene->addItem(enemy);
 

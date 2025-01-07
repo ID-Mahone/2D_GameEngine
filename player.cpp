@@ -48,25 +48,20 @@ void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
 }
 
 void Player::keyPressEvent(QKeyEvent *event) {
-    int dx = 0, dy = 0;
     int stepSize = map->getTileSize(); // Ensure movement matches tile size
 
-    switch (event->key()) {
-    case Qt::Key_W:
-        dy = -stepSize;  // Move up by one tile
-        break;
-    case Qt::Key_S:
-        dy = stepSize;   // Move down by one tile
-        break;
-    case Qt::Key_A:
-        dx = -stepSize;  // Move left by one tile
-        break;
-    case Qt::Key_D:
-        dx = stepSize;   // Move right by one tile
-        break;
-    case Qt::Key_Space:
-        jump();          // Jump
-        return;
+    // Update dx and dy based on pressed keys
+    if (event->key() == Qt::Key_W) {
+        dy = -stepSize;  // Move up
+    }
+    if (event->key() == Qt::Key_S) {
+        dy = stepSize;   // Move down
+    }
+    if (event->key() == Qt::Key_A) {
+        dx = -stepSize;  // Move left
+    }
+    if (event->key() == Qt::Key_D) {
+        dx = stepSize;   // Move right
     }
 
     // Only move if the target tile is walkable
@@ -75,6 +70,10 @@ void Player::keyPressEvent(QKeyEvent *event) {
     } else {
         qDebug() << "Blocked: Cannot move to (" << x() + dx << ", " << y() + dy << ")";
     }
+
+    // Reset dx and dy after movement
+    dx = 0;
+    dy = 0;
 }
 
 void Player::move(int dx, int dy) {

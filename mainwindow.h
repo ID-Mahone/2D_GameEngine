@@ -10,6 +10,7 @@
 #include "enemy.h"
 #include "frog.h"
 
+
 class MainWindow : public QMainWindow {
     Q_OBJECT
 

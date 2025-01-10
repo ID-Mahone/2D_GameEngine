@@ -15,46 +15,46 @@ MainWindow::MainWindow(QWidget *parent)
     enemy(new Enemy(map)),
     frog(new Frog(map)),    // Enemy initialized after player
     timer(new QTimer(this)) {
-    //setFixedSize(800, 600);
 
-    //view = new QGraphicsView(scene, this);
-    //setCentralWidget(view);
+    // Set up the tile size (64x64 as per your requirement)
+    const int tileSize = 64;
 
-    const int tileSize = 32;
+    // Calculate the window size based on map dimensions and tile size
+    int windowWidth = map->getWidth() * tileSize;
+    int windowHeight = map->getHeight() * tileSize;
 
-    // Calculate the minimum window size based on map dimensions
-    int minWidth = map->getWidth() * tileSize;
-    int minHeight = map->getHeight() * tileSize;
+    // Set the minimum size based on the map
+    setMinimumSize(windowWidth, windowHeight);
 
-    setMinimumSize(minWidth, minHeight);
-
-
-    //showFullScreen();
-
+    // Create the view and set it as the central widget
     view = new QGraphicsView(scene, this);
     setCentralWidget(view);
 
-    scene->setSceneRect(0, 0, 800, 600);
+    // Set scene to match the full map size (20x15 grid with 64x64 tiles)
+    scene->setSceneRect(0, 0, windowWidth, windowHeight);
 
+    // Add the map, player, and frog to the scene
     scene->addItem(map);
     scene->addItem(player);
     scene->addItem(frog);
 
-    player->setPos(32, 32);
+    // Set the initial position of the player
+    player->setPos(32, 32);  // Adjust if necessary
     player->setFlag(QGraphicsItem::ItemIsFocusable);
     player->setFocus();
 
-    Enemy *enemy = new Enemy(map);
+    // Create and position the enemy
     enemy->setPos(31, 31); // Set initial position for the enemy
     enemy->setZValue(2);
 
-    frog->setPos(31, 31); // Set initial position for the enemy
+    // Create and position the frog
+    frog->setPos(31, 31); // Set initial position for the frog
     frog->setZValue(2);
 
+    // Add the enemy to the scene
     scene->addItem(enemy);
 
-
-
+    // Map layout (same as before)
     const char charMap[15][20] = {
                                   {'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T'},
                                   {'T', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'T'},
@@ -71,13 +71,13 @@ MainWindow::MainWindow(QWidget *parent)
                                   {'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T'},
                                   };
 
-    // Load the map
+    // Load the map from the character layout
     map->loadFromCharMap(charMap);
 
+    // Set up the timer for game updates
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::gameUpdate);
     timer->start(16); // Update every 16ms (60FPS)
-
 }
 
 MainWindow::~MainWindow() {
@@ -90,5 +90,5 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::gameUpdate() {
-    scene->update();
+    scene->update();  // Update the scene (call this to refresh the game view)
 }

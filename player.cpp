@@ -8,9 +8,10 @@
 #include <QDebug>
 
 Player::Player(Map *map)
-    : currentFrame(0), currentRow(0), map(map), dx(0), dy(0) {
+    : currentFrame(0), currentRow(0), map(map), dx(0), dy(0),
+    isFacingRight(true), isDashing(false), dashSpeed(4.0f), moveSpeed(1.5f) {
 
-    spriteSheet.load(":/resources/player2.png/player2.png");  // Load the sprite sheet from resources
+    spriteSheet.load(":/resources/player2.png/player2.png");
 
     if (spriteSheet.isNull()) {
         qDebug() << "Failed to load sprite sheet!";
@@ -18,13 +19,23 @@ Player::Player(Map *map)
         qDebug() << "Sprite sheet loaded successfully.";
     }
 
+    setFlag(QGraphicsItem::ItemIsFocusable); // Allow player to receive focus
+    setFocus(); // Set initial focus on the player
+
     animationTimer = new QTimer(this);
     connect(animationTimer, &QTimer::timeout, this, &Player::updateFrame);
-    animationTimer->start(20);  // Update the frame every /ms
+    animationTimer->start(16); // ~60 FPS
+
+    dashTimer = new QTimer(this);
+    connect(dashTimer, &QTimer::timeout, this, &Player::endDash);
+
+    updateTimer = new QTimer(this);
+    connect(updateTimer, &QTimer::timeout, this, &Player::updatePosition);
+    updateTimer->start(16); // ~60 FPS
 }
 
 QRectF Player::boundingRect() const {
-    return QRectF(0, 0, 48, 48);  // Assuming 48x48 sprite size
+    return QRectF(0, 0, 48, 48);
 }
 
 void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
@@ -32,95 +43,125 @@ void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
     int frameY = currentRow * 48;
 
     QPixmap frame = spriteSheet.copy(frameX, frameY, 48, 48);
-
     frame = frame.scaled(48, 48, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
     if (!isFacingRight) {
         QTransform transform;
-        transform.scale(-1, 1);  // Flip horizontally
+        transform.scale(-1, 1);
         frame = frame.transformed(transform);
-
-
-        painter->drawPixmap(0, 0, frame);  // Offset by sprite width
+        painter->drawPixmap(0, 0, frame);
     } else {
         painter->drawPixmap(0, 0, frame);
     }
 }
 
 void Player::keyPressEvent(QKeyEvent *event) {
-    int stepSize = map->getTileSize(); // Ensure movement matches tile size
+    qDebug() << "Key pressed:" << event->key();
 
-    // Update dx and dy based on pressed keys
-    if (event->key() == Qt::Key_W) {
-        dy = -stepSize;  // Move up
-    }
-    if (event->key() == Qt::Key_S) {
-        dy = stepSize;   // Move down
-    }
-    if (event->key() == Qt::Key_A) {
-        dx = -stepSize;  // Move left
-    }
-    if (event->key() == Qt::Key_D) {
-        dx = stepSize;   // Move right
+    if (event->key() == Qt::Key_Shift && !isDashing) {
+        startDash();
     }
 
-    // Only move if the target tile is walkable
-    if (canMoveToTile(x() + dx, y() + dy)) {
-        move(dx, dy);
-    } else {
-        qDebug() << "Blocked: Cannot move to (" << x() + dx << ", " << y() + dy << ")";
-    }
+    if (event->key() == Qt::Key_W) keyW = true;
+    if (event->key() == Qt::Key_S) keyS = true;
+    if (event->key() == Qt::Key_A) keyA = true;
+    if (event->key() == Qt::Key_D) keyD = true;
+}
 
-    // Reset dx and dy after movement
+void Player::keyReleaseEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_W) keyW = false;
+    if (event->key() == Qt::Key_S) keyS = false;
+    if (event->key() == Qt::Key_A) keyA = false;
+    if (event->key() == Qt::Key_D) keyD = false;
+
+    qDebug() << "Key released. W:" << keyW << " A:" << keyA << " S:" << keyS << " D:" << keyD;
+
+    // Stop movement if no keys are pressed
+    if (!keyW && !keyS && !keyA && !keyD) {
+        dx = 0;
+        dy = 0;
+    }
+}
+
+void Player::updatePosition() {
     dx = 0;
     dy = 0;
+
+    if (keyW) dy -= moveSpeed;
+    if (keyS) dy += moveSpeed;
+    if (keyA) dx -= moveSpeed;
+    if (keyD) dx += moveSpeed;
+
+    // Update facing direction
+    if (dx > 0) isFacingRight = false;
+    if (dx < 0) isFacingRight = true;
+
+    if (dx == 0 && dy == 0) {
+        return; // No movement; skip processing
+    }
+
+    // Normalize diagonal movement
+    if (dx != 0 && dy != 0) {
+        dx /= 1.414; // Normalize
+        dy /= 1.414;
+    }
+
+    float speedMultiplier = isDashing ? dashSpeed : moveSpeed;
+    float actualDx = dx * speedMultiplier;
+    float actualDy = dy * speedMultiplier;
+
+    float newX = x() + actualDx;
+    float newY = y() + actualDy;
+
+    if (canMoveToTile(newX, newY)) {
+        setPos(newX, newY);
+    }
+    update();
+}
+
+bool Player::canMoveToTile(float dx, float dy) {
+    int tileX = dx / map->getTileSize();
+    int tileY = dy / map->getTileSize();
+
+    return map->isWalkable(tileX, tileY);
 }
 
 void Player::move(int dx, int dy) {
-    // Update the position of the player (implement logic for movement)
     float newX = x() + dx;
     float newY = y() + dy;
 
-    if(canMoveToTile(newX, newY)) {
+    if (canMoveToTile(newX, newY)) {
         setPos(newX, newY);
     }
 }
 
-void Player::jump() {
-    if (!isJumping) {
-        // Implement jump logic
-        isJumping = true;
-        setAnimationRow(6);  // Set to the jump/attack row
-        QTimer::singleShot(500, this, [this]() {  // Simulate jump completion
-            isJumping = false;
-            setAnimationRow(0);  // Return to idle row
-        });
-    }
-}
-
-bool Player::canMoveToTile(float dx, float dy) {
-    // Convert world coordinates to tile coordinates
-    int tileX = dx / map->getTileSize();
-    int tileY = dy / map->getTileSize();
-
-    qDebug() << "Checking walkability at tile coordinates (" << tileX << ", "<< tileY <<")";
-
-    bool walkable = map->isWalkable(tileX, tileY);
-    qDebug() << "Tile at (" << tileX << ", " << tileY << ") is walkable:" << walkable;
-
-
-    // Check if the tile is walkable using the map's isWalkable method
-    return walkable;
-}
-
 void Player::updateFrame() {
-    // Update the frame for the animation
-    currentFrame = (currentFrame + 1) % 3;  // Loop through 3 frames for the current action
-    update();  // Trigger a repaint of the player
+    currentFrame = (currentFrame + 1) % 3;
+    update();
 }
 
 void Player::setAnimationRow(int row) {
-    currentRow = row;  // Set the row based on the current action
-    currentFrame = 0;  // Reset the frame to the start of the animation
+    currentRow = row;
+    currentFrame = 0;
 }
 
+void Player::startDash() {
+    isDashing = true;
+    dashTimer->start(400);
+}
+
+void Player::endDash() {
+    isDashing = false;
+    dashTimer->stop();
+}
+
+void Player::focusInEvent(QFocusEvent *event) {
+    qDebug() << "Player gained focus";
+    QGraphicsItem::focusInEvent(event);
+}
+
+void Player::focusOutEvent(QFocusEvent *event) {
+    qDebug() << "Player lost focus. Reapplying focus...";
+    setFocus(); // Ensure the Player retains focus
+    QGraphicsItem::focusOutEvent(event);
+}

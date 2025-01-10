@@ -13,37 +13,52 @@ class Player : public QGraphicsObject {
     Q_OBJECT
 
 public:
-    explicit Player(Map *map);  // Constructor that accepts a map reference
+    explicit Player(Map *map);
 
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
-    void handleKeyPress(QKeyEvent *event);
-
     void move(int dx, int dy);
-    void jump();
+
 protected:
     void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
+
+    void focusInEvent(QFocusEvent *event) override;
+    void focusOutEvent(QFocusEvent *event) override;
 
 private:
-    bool isJumping = false;            // Flag for jumping
-    bool isFacingRight = false;         // Direction the player is facing
-    int currentFrame = 0;              // Current animation frame
-    int currentRow = 0;                // Current row (action) in the sprite sheet
-
-    QPixmap spriteSheet;               // Sprite sheet image (loaded from file)
-    QTimer *animationTimer;            // Timer to update animation frames
-    Map *map;
-
+    // Movement-related
     float dx = 0;
     float dy = 0;
-    float moveSpeed = 2.0f;        // Reference to the map for checking walkability
+    float moveSpeed = 1.5f;  // Default movement speed
+    float dashSpeed = 50.0f;  // Speed when dashing
+    bool isDashing = false;
 
+    // State variables
+    bool isFacingRight = true;
+    int currentFrame = 0;
+    int currentRow = 0;
 
-    void updateFrame();                // Advance the current animation frame
-    //  void move(int dx, int dy);         // Move the player                     // Jump action
-    void setAnimationRow(int row);     // Set the animation row for the current action
-    bool canMoveToTile(float newX, float newY);  // Check if the tile is walkable
+    // Animation-related
+    QPixmap spriteSheet;
+    QTimer *animationTimer;  // Handles sprite animation
+    QTimer *updateTimer;     // Handles smooth movement updates
+    QTimer *dashTimer;       // Timer for dash duration
+
+    // Input state
+    bool keyW = false, keyA = false, keyS = false, keyD = false;
+
+    // Associated map
+    Map *map;
+
+    // Functions
+    void updatePosition();         // Updates the player's position based on input
+    void updateFrame();            // Updates the sprite animation
+    void setAnimationRow(int row); // Sets the current animation row
+    bool canMoveToTile(float newX, float newY); // Checks if movement is valid
+    void startDash();              // Initiates a dash
+    void endDash();                // Ends dash when the timer completes
 };
 
 #endif // PLAYER_H

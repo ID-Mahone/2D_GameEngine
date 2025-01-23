@@ -4,7 +4,7 @@
 Welcome to "Shadows Call" a 2D Action RPG Game.
 Embark on a perilous journey into the abyss to confront a shadowy cult and unravel the secrets of their unholy power.
 
-# -The Game is still under development-
+### -Game is still under development-
 
 ## Key Features
 

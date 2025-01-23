@@ -30,25 +30,16 @@ This project is a modular and object-oriented 2D game engine designed using the 
 - **Qt Development Tools**: Qt Creator, Qt 5+ with `qmake`.
 - **C++ Compiler**: Compatible with Qt requirements (e.g., GCC, MSVC).
 
-### Build Instructions
-1. Clone the repository:
-   ```bash
-   git clone <repository_url>
-   cd <repository_directory>
 
-🚀 Setup and Usage
-Prerequisites
-Qt Development Tools: Qt Creator, Qt 5+ with qmake.
-C++ Compiler: GCC, MSVC, or equivalent (compatible with Qt).
-Build Instructions
+### 📦 Build Instructions
 Clone the repository:
 
-git clone <repository_url>
-cd <repository_name>
-Open the project in Qt Creator:
+- git clone <repository_url>
+- cd <repository_name>
+- Open the project in Qt Creator:
 
-Locate the .pro file and open it using Qt Creator.
-Build and run:
+- Locate the .pro file and open it using Qt Creator.
+- Build and run:
 
-Configure the build environment.
-Click "Run" to compile and launch the application.
+# Configure the build environment.
+-Click "Run" to compile and launch the application.

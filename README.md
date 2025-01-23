@@ -25,7 +25,6 @@ Embark on a perilous journey into the abyss to confront a shadowy cult and unrav
 - **Scripting:** Integration-ready for scripting to accelerate game logic development.
 
 
-
 ---
 
 
@@ -56,6 +55,60 @@ This project is a modular and object-oriented 2D game engine designed using the 
 - **Audio:** Expandable audio playback capabilities.
 
 ---
+
+# Using the Engine
+
+## Define a Scene
+
+Scenes act as containers for game objects, logic, and rendering. To create custom scene logic, you can extend the `Scene` class and implement the necessary methods.
+
+### Example:
+
+```cpp
+#include "Scene.h"
+
+class GameScene : public Scene {
+public:
+    void onEnter() override {
+        // Initialize scene objects
+    }
+
+    void update(float deltaTime) override {
+        // Game logic
+    }
+
+    void onExit() override {
+        // Cleanup resources
+    }
+};
+```
+
+### Explanation:
+- **onEnter()**: This method is called when the scene is entered. You can initialize any resources or objects here.
+- **update(float deltaTime)**: This method is called every frame. Use this method for the game logic and updates to your entities.
+- **onExit()**: This method is called when the scene is exited. You should clean up any resources here.
+
+## Create Entities and Add Components
+
+The **Entity-Component-System (ECS)** design pattern allows you to assemble game objects dynamically by adding components to entities. Here's how you can create entities and add components in the engine.
+
+### Example:
+
+```cpp
+void onEnter() override {
+    Entity player = createEntity("Player");
+    player.addComponent<TransformComponent>(/* initial position */);
+    player.addComponent<SpriteComponent>("player_texture.png");
+}
+```
+
+### Explanation:
+- **createEntity("Player")**: Creates a new entity named "Player".
+- **addComponent<TransformComponent>**: Adds a `TransformComponent` to the player entity, which might store position, rotation, and scale data.
+- **addComponent<SpriteComponent>**: Adds a `SpriteComponent` to render the player's sprite using the specified texture.
+
+This approach allows for dynamic and flexible game object creation where each entity can have different combinations of components to define its behavior.
+
 
 
 ## 🛠️  How to Build & Run

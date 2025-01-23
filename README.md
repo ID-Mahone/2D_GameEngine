@@ -1,6 +1,30 @@
 
 ![Master](https://github.com/user-attachments/assets/56bc8e81-dc0d-466d-9b75-fc4e58baaba6)
 
+Welcome to the **2D Game Engine**, a lightweight and modular platform designed to simplify the development of 2D games. This engine provides robust architectural patterns and state-of-the-art features to accelerate your game development workflow, all while maintaining scalability and performance.
+
+## Key Features
+
+### Core Architecture
+- **Entity-Component-System (ECS):** Decoupled data and behavior for scalability and reusability.
+- **Scene Management:** Dynamic handling of multiple game scenes with lifecycle management.
+
+### Graphics and Rendering
+- **High-Performance Rendering:** Optimized rendering pipeline for smooth graphics.
+- **Texture Management:** Efficient loading and management of sprites and textures.
+
+### Input and Interaction
+- **Input Handling:** Comprehensive support for keyboard and mouse input.
+- **Event System:** Decoupled event-driven architecture for inter-component communication.
+
+### Extensibility
+- **Plugin Support:** Modular design to easily extend engine capabilities.
+- **Scripting:** Integration-ready for scripting to accelerate game logic development.
+
+
+
+---
+
 
 # 2D Game Engine Using Qt Framework
 
@@ -23,6 +47,10 @@ This project is a modular and object-oriented 2D game engine designed using the 
 - **Extensible Design**:
   - Modular components for scene management, player, and NPCs.
   - Clearly defined class responsibilities ensure maintainability and scalability.
+
+### Additional Features
+- **Physics Integration:** Support for collision detection and basic physics.
+- **Audio:** Expandable audio playback capabilities.
 
 ---
 

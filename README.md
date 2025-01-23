@@ -27,14 +27,14 @@ This project is a modular and object-oriented 2D game engine designed using the 
 ---
 
 
-## 📦 How to Build & Run
+## 🛠️  How to Build & Run
 
 ### Prerequisites
 - **Qt Development Tools**: Qt Creator, Qt 5+ with `qmake`.
 - **C++ Compiler**: Compatible with Qt requirements (e.g., GCC, MSVC).
 
 
-### 📦 Build Instructions
+### 🚀 Build Instructions
 Clone the repository:
 
 - git clone <repository_url>

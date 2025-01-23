@@ -73,7 +73,4 @@ Clone the repository:
 - Open the project in Qt Creator:
 
 - Locate the .pro file and open it using Qt Creator.
-- Build and run:
-
-# Configure the build environment.
--Click "Run" to compile and launch the application.
+- Build and run
